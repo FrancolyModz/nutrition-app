@@ -1,44 +1,63 @@
-const foods = [
-  { id: 1, name: 'Combo Burger', restaurant: 'McDrive', kcal: 850, protein: 35, carbs: 90, fat: 42 },
-  { id: 2, name: 'Pollo Frito', restaurant: 'KFC', kcal: 720, protein: 45, carbs: 60, fat: 35 },
-  { id: 3, name: 'Pizza Mediana', restaurant: 'Dominos', kcal: 900, protein: 30, carbs: 110, fat: 40 },
-]
+import DetailedComboCard from '../components/DetailedComboCard'
+import { useDetailedCombos } from '../hooks/useDetailedCombos'
 
 export default function FoodCatalog() {
+  const { filteredCombos, restaurants, searchTerm, setSearchTerm, selectedRestaurant, setSelectedRestaurant } = useDetailedCombos()
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Catálogo de Combos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {foods.map((food) => (
-          <div key={food.id} className="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
-            <h3 className="text-xl font-bold text-gray-900">{food.name}</h3>
-            <p className="text-sm text-gray-500 mb-4">{food.restaurant}</p>
-            
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Calorías:</span>
-                <span className="font-bold text-primary">{food.kcal} kcal</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Proteína:</span>
-                <span className="font-bold text-secondary">{food.protein}g</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Carbos:</span>
-                <span className="font-bold text-warning">{food.carbs}g</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Grasas:</span>
-                <span className="font-bold text-success">{food.fat}g</span>
-              </div>
-            </div>
-            
-            <button className="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">
-              Agregar a mi día
-            </button>
-          </div>
-        ))}
+      <h1 className="text-4xl font-bold mb-2">🍔 Menú de McDonald's Chile</h1>
+      <p className="text-gray-600 mb-8">
+        Haz click en cualquier combo para ver todos los detalles nutricionales de cada producto.
+      </p>
+
+      {/* Buscador */}
+      <div className="mb-8 flex flex-col md:flex-row gap-4">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="🔍 Buscar combo (ej: Doble Cuarto, Big Mac, Pollo...)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        {/* Filtro por restaurante */}
+        <select
+          value={selectedRestaurant}
+          onChange={(e) => setSelectedRestaurant(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          <option value="all">Todos los restaurantes</option>
+          {restaurants.map((restaurant) => (
+            <option key={restaurant} value={restaurant}>
+              {restaurant}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Info de resultados */}
+      <div className="mb-6 text-sm text-gray-600">
+        <p>Mostrando {filteredCombos.length} combo(s)</p>
+      </div>
+
+      {/* Grid de combos */}
+      {filteredCombos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredCombos.map((combo) => (
+            <DetailedComboCard key={combo.id} combo={combo} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+          <p className="text-yellow-800 text-lg">
+            😕 No se encontraron combos que coincidan con tu búsqueda
+          </p>
+          <p className="text-yellow-600 text-sm mt-2">Intenta con otros términos</p>
+        </div>
+      )}
     </div>
   )
 }
